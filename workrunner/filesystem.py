@@ -181,6 +181,34 @@ class Xfs(FileSystemBase):
         if ret != 0:
             raise RuntimeError("Failed to make dev:{}".format(self.dev))
 
+class Zfs(FileSystemBase):
+    def make(self, opt_dic=None):
+        opt_str = opts_to_str(opt_dic)
+
+        # Create a pool with wiscsee
+        ret = utils.shcmd("zpool create -f wiscsee {dev}".format(dev=self.dev))
+
+        if ret != 0:
+            err_msg = "Failed to create ZFS pool on disk:{}. The cause of this could be many things.\n Just make sure you are root, and that the disc you are trying to format is large enough"
+            raise RuntimeError(err_msg.format(self.dev))
+
+        # Create a single disk in that pool
+        ret = utils.shcmd("zfs create wiscsee/zfsws")
+        if ret != 0:
+            err_msg = "Failed to created ZFS disk inside the wiscsee pool."
+            raise RuntimeError(err_msg)
+
+    def mount(self, opt_list=None):
+
+        # Use ZFS and zpool to mount the partition directly
+        opt_str = mountoption_to_str(opt_list)
+
+        utils.prepare_dir(self.mount_point)
+        ret = utils.shcmd('zfs set mountpoint=/mnt/fsloop wiscsee/zfsws')
+        if ret != 0:
+            raise RuntimeError("Failed to mount (ZFS WS) dev:{} to dir:{}".format(
+                self.dev, self.mount_point))
+
 # loopdev = LoopDevice(dev_path = '/dev/loop0', tmpfs_mount_point = '/mnt/tmpfs',
         # size_mb = 4096)
 # loopdev.create()

@@ -135,6 +135,8 @@ class WorkloadRunner(object):
             fsclass = filesystem.Btrfs
         elif fs == 'xfs':
             fsclass = filesystem.Xfs
+        elif fs == 'zfs':
+            fsclass = filesystem.Zfs
         else:
             raise RuntimeError("{} is not a valid file system type"\
                 .format(fs))
@@ -306,6 +308,8 @@ class WorkloadRunner(object):
             utils.shcmd('sync')
             self.dumpe2fs()
             # self.dump_extents()
+  #      if self.conf['filesystem'] == 'zfs' is True:
+  #          cmd = "zpool destroy wiscsee" # This just removes the ZFS pool after we had made it
 
     def dumpe2fs(self):
         dumppath = os.path.join(self.conf['result_dir'], 'dumpe2fs.out')

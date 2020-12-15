@@ -40,6 +40,20 @@ class Workload(object):
     def stop(self):
         raise NotImplementedError
 
+class LinuxDdTest(Workload):
+    def __init__(self, confobj, workload_conf_key = None):
+            super(LinuxDdWrite, self).__init__(confobj, workload_conf_key)
+    def run(self):
+        mnt = self.conf["fs_mount_point"]
+        cmd = "dd if=/dev/zero of={}/datafile bs=64k count=128".format(mnt)
+        print cmd
+        subprocess.call(cmd, shell=True)
+        subprocess.call("sync")
+
+    def stop(self):
+        pass
+
+
 class NoOp(Workload):
     """
     This is a workload class that does nothing. It may be used to skip
@@ -101,4 +115,30 @@ class SimpleRandReadWrite(Workload):
     # def stop(self):
         # pass
 
+class LinuxDdWrite(Workload):
+    def __init__(self, confobj, workload_conf_key = None):
+        super(LinuxDdWrite, self).__init__(confobj, workload_conf_key)
 
+    def run(self):
+        mnt = self.conf["fs_mount_point"]
+        cmd = "dd if=/dev/zero of={}/datafile bs=64k count=128".format(mnt)
+        print cmd
+        subprocess.call(cmd, shell=True)
+        subprocess.call("sync")
+
+    def stop(self):
+        pass
+
+class Varmail2min(Workload):
+    def __init__(self, confobj, workload_conf_key = None):
+        super(Varmail2min, self).__init__(confobj, workload_conf_key)
+
+    def run(self):
+        mnt = self.conf["fs_mount_point"]
+        replace_cmd = "sed 's/MOUNT_POINT_TO_REPLACE/{}/g' /users/yuhua/varmail.f > /users/yuhua/varmail_replaced.f".format(mnt.replace('/', '\\/'))
+        cmd = "sudo filebench -f /users/yuhua/varmail_replaced.f"
+        print replace_cmd
+        print cmd
+        subprocess.call(replace_cmd, shell=True)
+        subprocess.call(cmd, shell=True)
+        subprocess.call("sync")
