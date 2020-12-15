@@ -204,7 +204,7 @@ class Zfs(FileSystemBase):
         opt_str = mountoption_to_str(opt_list)
 
         utils.prepare_dir(self.mount_point)
-        ret = utils.shcmd('zfs set mountpoint=/mnt/fsloop wiscsee/zfsws')
+        ret = utils.shcmd('zfs set mountpoint={mp} wiscsee/zfsws'.format(mp=self.mount_point))
         if ret != 0:
             raise RuntimeError("Failed to mount (ZFS WS) dev:{} to dir:{}".format(
                 self.dev, self.mount_point))

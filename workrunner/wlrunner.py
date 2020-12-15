@@ -307,9 +307,17 @@ class WorkloadRunner(object):
         if self.conf['filesystem'] == 'ext4' and self.conf['dump_ext4_after_workload'] is True:
             utils.shcmd('sync')
             self.dumpe2fs()
-            # self.dump_extents()
-  #      if self.conf['filesystem'] == 'zfs' is True:
-  #          cmd = "zpool destroy wiscsee" # This just removes the ZFS pool after we had made it
+            self.dump_extents()
+
+        if self.conf['filesystem'] == 'zfs':
+            cmd = "zpool destroy wiscsee" # This just removes the ZFS pool after we had made it
+            print("ZFS Run is done. Freeing up WiscSee pool...")
+            ret = utils.shcmd(cmd)
+            if(ret != 0):
+                print("ZFS destroy of WiscSee pool failed. You might have to get rid of the pool yourself.")
+                print("Command: zpool destroy wiscsee")
+            else:
+                print("ZFS destroy of WiscSee pool succesful.")
 
     def dumpe2fs(self):
         dumppath = os.path.join(self.conf['result_dir'], 'dumpe2fs.out')
